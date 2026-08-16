@@ -1,0 +1,71 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<style>
+    .room_container{
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+    }
+</style>
+
+<div class="room_container">
+    <div>
+    <h1>{{room.name}}</h1>
+    <h2>{{room.description}}</h2>
+    <hr>
+    {% if request.user.is_authenticated %}
+    {% if request.user not in members %}
+    <a href="{% url 'room' room.id %}?q=join">+ Join</a>
+    {% endif %}
+    {% else %}
+    <h4><a href="{% url 'login' %}?next={{request.path}}">Login</a> to join room</h4>
+    {% endif %}
+    <div class="comments_wrap">
+        <h3>{{message_count}} Comment{{message_count | pluralize}}</h3>
+        <hr>
+        {% for message in messagus %}
+        <small><a href="{% url 'userProfile' message.user.id %}">@{{ message.user.username }}</a> {{ message.created | timesince }} ago</small>
+        <h5>{{message.body}}</h5>
+        {% if request.user == message.user %}
+        <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="message_id" value="{{message.id}}">
+            <input type="submit" name="comment_delete" value="delete">
+        </form>
+        {% if message.edit == False %}
+        <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="message_id" value="{{message.id}}">
+            <input type="submit" name="button" value="Edit">
+        </form>
+        {% endif %}
+        {% if message.edit == True %}
+        <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="message_id" value="{{message.id}}">
+            <input type="text" name="edited_message" value="{{message.body}}">
+            <input type="submit" name="comment_edited" value="Save">
+        </form>
+        {% endif %}
+        {% endif %}
+        <hr>
+        {% endfor %}
+        {% if request.user in members %}
+        <form method="post" action="">
+            {% csrf_token %}
+            <input type="text" name="comment" placeholder="comment..">
+            <input type="submit" value="Post">
+        </form>
+        {% endif %}
+    </div>
+    </div>
+<div class="Member">
+    <h2>Members</h2>
+    <hr>
+    {% for user in members %}
+    <a href="{% url 'userProfile' user.id %}">@{{user.username}}</a>
+    <hr>
+    {% endfor %}
+</div>
+</div>
+{% endblock %}
