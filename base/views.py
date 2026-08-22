@@ -9,13 +9,13 @@ from .forms import RoomForm,Userform,myUserCreationForm
 def loginpage(request):
     page='login'
     if request.method=='POST':
-        usernam=request.POST.get('username','')
+        Email=request.POST.get('email','')
         pasword=request.POST.get('password','')
         try:
-            user=User.objects.get(username=usernam)
+            user=User.objects.get(email=Email)
         except:
             messages.error(request,"User does not exist")
-        user=authenticate(request,username=usernam,password=pasword)
+        user=authenticate(request,email=Email,password=pasword)
         if user is not None:
             login(request,user)
             next_url=request.GET.get('next')
