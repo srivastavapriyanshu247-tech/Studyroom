@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q,Count
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate,login,logout
 from .models import Room,topic,message,User
@@ -52,9 +52,9 @@ def home(request):
     if user:
         return redirect('userProfile',pk=user.id)
     rooms=Room.objects.filter(Q(topic__name__icontains=q)| Q(name__icontains=q)) 
-    topics=topic.objects.all()[:4]
+    topics=topic.objects.annotate(room_count=Count('room')).order_by('-room_count')[:4]
     room_count=rooms.count()
-    topic_count=topics.count()
+    topic_count=Room.objects.all().count()
     mussage=message.objects.filter(room__in=rooms).order_by('-created')[:7]
     return render(request,'home.html',{'rooms':rooms,
                                        'topics':topics,
@@ -194,7 +194,8 @@ def edit_user(request):
 
 
 def topicpage(request):
-    topics=topic.objects.all()
+    q=request.GET.get('q',"")
+    topics=topic.objects.filter(name__icontains=q)
     return render(request,'topics.html',{'topics':topics})
 
     
