@@ -106,13 +106,24 @@ def room(request,pk):
 
 def room2(request,pk):
     return render(request,'room2.html')
-
+@login_required(login_url='login')
 def user_profile(request,pk):
     host=User.objects.get(id=pk)
+    q=request.GET.get('q','')
+    if q == 'follow':
+        host.followers.add(request.user)
+        host.save()
+        return redirect('userProfile',pk=host.id)
+    elif q == 'unfollow':
+        host.followers.remove(request.user)
+        host.save()
+        return redirect('userProfile',pk=host.id)
     mussage=host.message_set.all().order_by('-created')[:5]
     rooms=host.room_set.all()
     topics=topic.objects.all()[:4]
-    content={'user':host, 'mussages':mussage, 'rooms':rooms,'topics':topics}
+    followings=host.following.all()
+    is_following=host.followers.filter(id=request.user.id).exists()
+    content={'user':host, 'mussages':mussage, 'rooms':rooms,'topics':topics,'is_following':is_following}
     return render(request,'user_profile.html',content)
 
 @login_required(login_url='login')

@@ -21,6 +21,7 @@
             {% if user == request.user %}
             <a href="{% url 'editUser' %}" class="btn btn--main btn--pill">Edit Profile</a>
             {% endif %}
+            <a href="" class="btn btn--main btn--pill">{{user.followers.count}} followers</a>
           </div>
           <div class="profile__about">
             <h3>About</h3>
@@ -29,7 +30,16 @@
             </p>
           </div>
         </div>
-
+        <div>
+          {% if user != request.user %}
+          <form method="post" action="{% url 'userProfile' user.id %}?q={% if is_following %}unfollow{% else %}follow{% endif %}">
+            {% csrf_token %}
+          <button type="submit" class="btn btn--main btn--pill">
+            {% if is_following %} unfollow {% else %} follow {% endif %}
+          </button>
+          </form>
+          {% endif %}
+        </div>
         <div class="roomList__header">
           <div>
             <h2>Study Rooms Hosted by {{user.username}}</a>

@@ -6,6 +6,7 @@ class User(AbstractUser):
     bio=models.TextField(null=True)
     email=models.CharField(unique=True)
     avatar=models.ImageField(null=True,default='avatar.svg')
+    followers=models.ManyToManyField('self',related_name='following',symmetrical=False,blank=True)
     USERNAME_FIELD='email'
     REQUIRED_FIELDS=[]
 
