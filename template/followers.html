@@ -42,11 +42,22 @@
         </div>
         <div class="roomList__header">
           <div>
-            <h2>Study Rooms Hosted by {{user.username}}</a>
+            <h2>Followed by</a>
             </h2>
           </div>
         </div>
-        {% include 'feed_component.html' %}
+          {% for follower in followers %}
+          <div class="roomListRoom">
+            <div class="roomListRoom__header">
+              <a href="{% url 'userProfile' follower.id %}" class="roomListRoom__author">
+                <div class="avatar avatar--small">
+                  <img src="{{follower.avatar.url}}" />
+                </div>
+                <span>@{{follower.username}}</span>
+              </a>
+            </div>
+          </div>
+        {% endfor %}
       </div>
       <!-- Room List End -->
 
